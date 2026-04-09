@@ -20,27 +20,6 @@ const createPost = asyncHandler(async (req, res) => {
 	res.status(201).json(post);
 });
 
-const likePost = asyncHandler(async (req, res) => {
-	const { id } = req.params;
-
-	if (!mongoose.isValidObjectId(id)) {
-		res.status(400);
-		throw new Error("Invalid post id");
-	}
-
-	const post = await Post.findById(id);
-
-	if (!post) {
-		res.status(404);
-		throw new Error("Post not found");
-	}
-
-	post.likes += 1;
-	const updatedPost = await post.save();
-
-	res.json(updatedPost);
-});
-
 const deletePost = asyncHandler(async (req, res) => {
 	const { id } = req.params;
 
@@ -62,4 +41,4 @@ const deletePost = asyncHandler(async (req, res) => {
 	res.json({ message: "Post removed" });
 });
 
-export { createPost, deletePost, getPosts, likePost };
+export { createPost, deletePost, getPosts };
