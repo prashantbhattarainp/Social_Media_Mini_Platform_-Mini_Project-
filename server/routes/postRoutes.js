@@ -1,32 +1,11 @@
 import express from "express";
-import Post from "../models/post.js";
+import { createPost, deletePost, getPosts, likePost } from "../controllers/postController.js";
 
 const router = express.Router();
 
-// GET all posts
-router.get("/", async (req, res) => {
-  const posts = await Post.find();
-  res.json(posts);
-});
-
-// CREATE post
-router.post("/", async (req, res) => {
-  const { content } = req.body;
-
-  const newPost = new Post({ content });
-  await newPost.save();
-
-  res.json(newPost);
-});
-
-// LIKE post
-router.put("/:id/like", async (req, res) => {
-  const post = await Post.findById(req.params.id);
-
-  post.likes += 1;
-  await post.save();
-
-  res.json(post);
-});
+router.get("/", getPosts);
+router.post("/", createPost);
+router.put("/:id/like", likePost);
+router.delete("/:id", deletePost);
 
 export default router;
