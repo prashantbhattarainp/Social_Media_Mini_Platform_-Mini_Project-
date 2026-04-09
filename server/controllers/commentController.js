@@ -36,6 +36,7 @@ const addComment = asyncHandler(async (req, res) => {
 	}
 
 	const comment = await Comment.create({
+		user: req.user._id,
 		post: postId,
 		content: content.trim(),
 	});
@@ -44,6 +45,38 @@ const addComment = asyncHandler(async (req, res) => {
 	await post.save();
 
 	res.status(201).json(comment);
+});
+
+const updateComment = asyncHandler(async (req, res) => {
+	const { id } = req.params;
+	const { content } = req.body;
+
+	if (!mongoose.isValidObjectId(id)) {
+		res.status(400);
+		throw new Error("Invalid comment id");
+	}
+
+	if (!content || !content.trim()) {
+		res.status(400);
+		throw new Error("Comment content is required");
+	}
+
+	const comment = await Comment.findById(id);
+
+	if (!comment) {
+		res.status(404);
+		throw new Error("Comment not found");
+	}
+
+	if (String(comment.user) !== String(req.user._id)) {
+		res.status(403);
+		throw new Error("You are not allowed to edit this comment");
+	}
+
+	comment.content = content.trim();
+	await comment.save();
+
+	res.json(comment);
 });
 
 const deleteComment = asyncHandler(async (req, res) => {
@@ -61,6 +94,11 @@ const deleteComment = asyncHandler(async (req, res) => {
 		throw new Error("Comment not found");
 	}
 
+	if (String(comment.user) !== String(req.user._id)) {
+		res.status(403);
+		throw new Error("You are not allowed to delete this comment");
+	}
+	
 	const post = await Post.findById(comment.post);
 	if (post && post.commentsCount > 0) {
 		post.commentsCount -= 1;
@@ -72,4 +110,4 @@ const deleteComment = asyncHandler(async (req, res) => {
 	res.json({ message: "Comment removed" });
 });
 
-export { addComment, deleteComment, getCommentsByPost };
+export { addComment, deleteComment, getCommentsByPost, updateComment };

@@ -19,19 +19,20 @@ const toggleLike = asyncHandler(async (req, res) => {
 		throw new Error("Post not found");
 	}
 
-	const likeRecord = await Like.findOne({ post: postId });
-	const nextLiked = typeof liked === "boolean" ? liked : !(likeRecord?.liked ?? false);
+	const likeRecord = await Like.findOne({ post: postId, user: req.user._id });
+	const previousLiked = likeRecord?.liked ?? false;
+	const nextLiked = typeof liked === "boolean" ? liked : !previousLiked;
 
 	if (!likeRecord) {
-		await Like.create({ post: postId, liked: nextLiked });
+		await Like.create({ user: req.user._id, post: postId, liked: nextLiked });
 	} else {
 		likeRecord.liked = nextLiked;
 		await likeRecord.save();
 	}
 
-	if (nextLiked) {
+	if (nextLiked && !previousLiked) {
 		post.likes += 1;
-	} else if (post.likes > 0) {
+	} else if (!nextLiked && previousLiked && post.likes > 0) {
 		post.likes -= 1;
 	}
 
