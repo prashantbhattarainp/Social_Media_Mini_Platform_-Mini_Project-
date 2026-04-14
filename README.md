@@ -120,7 +120,7 @@ API Endpoints
 
 Learning Outcomes
 
- Understanding full-stack development using MERN
+ Understand full-stack development using MERN
  REST API design and implementation
  Database modeling using MongoDB
  State management and component-based UI
