@@ -5,13 +5,13 @@ export default ({ mode }) => {
 
   return defineConfig({
     server: {
-      proxy: {
-        '/api': {
-          target: env.VITE_APP_URL,
-          changeOrigin: true,
-          secure: false,
-        },
-      },
+      // proxy: {
+      //   '/api': {
+      //     target: env.VITE_APP_URL,
+      //     changeOrigin: true,
+      //     secure: false,
+      //   },
+      // },
     },
     preview: {
     port: 8080,
