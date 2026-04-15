@@ -4,6 +4,7 @@ import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
+router.get("/post/:postId", getCommentsByPost);
 router.get("/:postId", getCommentsByPost);
 router.post("/", protect, addComment);
 router.put("/:id", protect, updateComment);
