@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const commentSchema = new mongoose.Schema(
+const likeSchema = new mongoose.Schema(
 	{
 		user: {
 			type: mongoose.Schema.Types.ObjectId,
@@ -12,17 +12,14 @@ const commentSchema = new mongoose.Schema(
 			ref: "Post",
 			required: true,
 		},
-		content: {
-			type: String,
-			trim: true,
-			required: true,
-			minlength: 1,
-			maxlength: 1000,
+		liked: {
+			type: Boolean,
+			default: true,
 		},
 	},
 	{ timestamps: true }
 );
 
-commentSchema.index({ post: 1, createdAt: 1 });
+likeSchema.index({ user: 1, post: 1 }, { unique: true });
 
-export default mongoose.model("Comment", commentSchema);
+export default mongoose.model("Like", likeSchema);
