@@ -17,7 +17,7 @@ const loadSinglePostPayload = async (postId, viewerId = null) => {
   const [comments, likeRecord] = await Promise.all([
 		Comment.find({ post: post._id }).sort({ createdAt: 1, _id: 1 }).populate(USER_POPULATE),
     viewerId && mongoose.isValidObjectId(viewerId)
-      ? Like.findOne({ post: post._id, user: viewerId, liked: true }).select("_id")
+      ? Like.findOne({ post: post._id, user: viewerId }).select("_id")
       : Promise.resolve(null),
   ]);
 
@@ -37,7 +37,7 @@ const loadFeedPayload = async (posts, viewerId = null) => {
   const [comments, likes] = await Promise.all([
 		Comment.find({ post: { $in: postIds } }).sort({ createdAt: 1, _id: 1 }).populate(USER_POPULATE),
     viewerId && mongoose.isValidObjectId(viewerId)
-      ? Like.find({ user: viewerId, post: { $in: postIds }, liked: true }).select("post")
+      ? Like.find({ user: viewerId, post: { $in: postIds } }).select("post")
       : Promise.resolve([]),
   ]);
 

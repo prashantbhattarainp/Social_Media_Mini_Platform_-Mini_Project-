@@ -19,23 +19,22 @@ const toggleLike = asyncHandler(async (req, res) => {
 		throw new Error("Post not found");
 	}
 
-	const likeRecord = await Like.findOne({ post: postId, user: req.user._id, liked: true });
-	const currentlyLiked = Boolean(likeRecord);
+	// Presence of a Like record = liked, absence = not liked
+	const existingLike = await Like.findOne({ post: postId, user: req.user._id }).select("_id");
+	const currentlyLiked = Boolean(existingLike);
 	const nextLiked = typeof liked === "boolean" ? liked : !currentlyLiked;
 
-	if (nextLiked) {
-		await Like.updateOne(
-			{ user: req.user._id, post: postId },
-			{ $set: { liked: true } },
-			{ upsert: true }
-		);
-	} else {
+	if (nextLiked && !existingLike) {
+		// Add a Like record only if one doesn't already exist
+		await Like.create({ user: req.user._id, post: postId });
+	} else if (!nextLiked && existingLike) {
+		// Remove the Like record to mark as "not liked"
 		await Like.deleteOne({ user: req.user._id, post: postId });
 	}
 
-	const likesCount = await Like.countDocuments({ post: postId, liked: true });
+	// Recount and persist the updated likes total on the post
+	const likesCount = await Like.countDocuments({ post: postId });
 	post.likes = likesCount;
-
 	await post.save();
 
 	res.json({
