@@ -38,12 +38,17 @@ app.set("trust proxy", 1);
 
 // middleware
 app.use(
-  cors(
-    {
-      origin: process.env.VITE_APP_URL,
-      credentials: true,
-    }
-  )
+  cors({
+    origin: (origin, callback) => {
+      if (isAllowedOrigin(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  })
 );
 app.use(cookieParser());
 app.use(express.json());
