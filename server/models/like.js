@@ -12,10 +12,6 @@ const likeSchema = new mongoose.Schema(
 			ref: "Post",
 			required: true,
 		},
-		liked: {
-			type: Boolean,
-			default: true,
-		},
 	},
 	{ timestamps: true }
 );
